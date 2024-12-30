@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Voice from "@react-native-voice/voice";
+import Voice from '@react-native-community/voice';
 
 
 interface ChatMessage {
@@ -28,7 +28,7 @@ const ChatScreen: React.FC = () => {
   const speechEndHandler = async (e: any) => {
     try {
       // await Voice.start('en-US');
-      console.log("speech emd");
+      console.log("speech end");
       setIsListening(false);
     } catch (e) {
       console.error(e);
