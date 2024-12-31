@@ -1,44 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Voice from '@react-native-community/voice';
+import { apiCall } from '@/api/openai';
 
 
 interface ChatMessage {
-  id: string;
-  text: string;
-  isUser: boolean;
+  role: string;
+  content: string;
 }
 
 const ChatScreen: React.FC = () => {
-  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [recording, setRecording] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([{role: "assistant", content: "Hey, how are you today?"}]);
+  const [result, setResult] = useState("");
+  const ScrollViewRef = useRef();
 
   const speechStartHandler = async () => {
     try {
-      // await Voice.start('en-US');
       console.log("speech started");
-      setIsListening(true);
+      setIsSpeaking(true);
     } catch (e) {
       console.error(e);
-    }
+    } 
   };
 
   const speechEndHandler = async (e: any) => {
     try {
-      // await Voice.start('en-US');
       console.log("speech end");
-      setIsListening(false);
+      setIsSpeaking(false);
     } catch (e) {
       console.error(e);
     }
   };
+  
 
   const speechResultsHandler = async (e: any) => {
     try {
-      // await Voice.start('en-US');
       console.log("speech results" ,e);
+      setResult(e.value[0]);
     } catch (e) {
       console.error(e);
     }
@@ -60,38 +61,43 @@ const ChatScreen: React.FC = () => {
 
   const stopRecording = async () => {
     if (Voice) {
+      setRecording(false);
       try {
         await Voice.stop();
-        setRecording(false);
+        await fetchResponse();
       } catch (error) {
         console.error(error);
       } 
     }
   }
 
-  
+  const clear = () => {
+    setMessages([]);
+  }
 
-  // const stopListening = async () => {
-  //   try {
-  //     // await Voice.stop();
-  //     setIsListening(false);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
+  const fetchResponse = async () => {
+    if(result.trim().length > 0) {
+      let newMessages = [...messages];
+      newMessages.push({role: "user", content: result})
+      setMessages([...newMessages]);
+      updateScrollView();
+      apiCall(newMessages).then(res => {
+        if (res?.success) {
+          setMessages([...res.data]);
+          setResult('');
+          updateScrollView();
+        } else {
+          Alert.alert("Error on creating response: ", res!.data ?? "Unknown")
+        }
+      })
+    }
+  }
 
-  // Voice.onSpeechResults = (e: any) => {
-  //   if (e.value) {
-  //     const newMessage: ChatMessage = {
-  //       id: Date.now().toString(),
-  //       text: e.value[0],
-  //       isUser: true,
-  //     };
-  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
-  //     // Here you would typically send the message to your AI service
-  //     // and then add the AI's response to the messages array
-  //   }
-  // };
+  const updateScrollView = () => {
+    setTimeout(() => {
+        ScrollViewRef?.current?.scrollToEnd({animated: true});
+    }, 400);
+  }; 
 
   useEffect(() => {
     Voice.onSpeechStart = speechStartHandler;
@@ -107,19 +113,19 @@ const ChatScreen: React.FC = () => {
   
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.chatBox}>
-      <ScrollView style={styles.chatHistory}>
+      <ScrollView ref={ScrollViewRef} style={styles.chatHistory}>
         {messages.length > 0 ?
-          messages.map((message) => (
+          messages.map((message, index) => (
             <View
-              key={message.id}
+              key={index}
               style={[
-                message.isUser ? styles.userMessage : styles.aiMessage,
+                message.role == "user" ? styles.userMessage : styles.aiMessage,
                 styles.messageBubble,
               ]}
             >
-              <Text style={styles.messageText}>{message.text}</Text>
+              <Text style={styles.messageText}>{message.content}</Text>
             </View>
           )) : <View
             key="empty"
@@ -134,20 +140,20 @@ const ChatScreen: React.FC = () => {
       </ScrollView>
       </View>
       <TouchableOpacity
-        style={[styles.speakButton, isListening && styles.listeningButton]}
+        style={[styles.speakButton, isSpeaking && styles.SpeakingButton]}
         onPressIn={startRecording}
         onPressOut={stopRecording}
       >
         <Ionicons
-          name={isListening ? 'mic' : 'mic-outline'}
+          name={isSpeaking ? 'mic' : 'mic-outline'}
           size={26}
           color="#FFFFFF"
         />
         <Text style={styles.speakButtonText}>
-          {isListening ? 'Listening...' : 'Hold to Speak'}
+          {isSpeaking ? 'Speaking...' : 'Hold to Speak'}
         </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -196,7 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     transitionDuration: ".2",
   },
-  listeningButton: {
+  SpeakingButton: {
     backgroundColor: '#c1666b',
     opacity: 1,
   },
