@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# LinguaNova - AI-Powered Language Learning App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+LinguaNova is an AI-powered language practicing application built with **React Native**. The app combines cutting-edge technologies like speech recognition, large language models, and engaging animations to deliver a personalized and immersive language learning experience.
 
-## Get started
+---
 
-1. Install dependencies
+## **Features**
 
+### 1. **Speech Recognition for Pronunciation Practice**
+- Real-time feedback on pronunciation accuracy using advanced speech recognition.
+
+### 2. **Integration with Large Language Models**
+- AI-powered conversation practice tailored to the user’s skill level.
+- Dynamic prompts and responses to simulate real-world scenarios.
+
+### 3. **Spaced Repetition Algorithm**
+- Optimized vocabulary review schedules to reinforce learning.
+
+---
+
+## **Tech Stack**
+
+- **Frontend**: React Native, React Navigation
+- **AI Integration**: OpenAI GPT API
+- **Animations**: react-native-reanimated, react-native-lottie
+
+---
+
+## **Getting Started**
+
+### Prerequisites
+- Node.js (v16 or higher)
+- Yarn or npm
+- Android Studio (for Android emulator) / Xcode (for iOS simulator)
+- OpenAI API key for language model integration
+
+### Installation
+
+1. Clone the repository:
    ```bash
+   git clone https://github.com/erkingonultas/linguanova.git
+   cd linguanova
+   ```
+
+2. Install dependencies:
+   ```bash
+   yarn install
+   # or
    npm install
    ```
 
-2. Start the app
+3. Set up environment variables:
+   - Create a `.env` file in the root directory.
+   - Add the following:
+     ```env
+     apiKey=your_openai_api_key
+     ```
 
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+4. Run the app:
+   - For iOS:
+     ```bash
+     npx react-native run-ios
+     ```
+   - For Android:
+     ```bash
+     npx react-native run-android
+     ```
