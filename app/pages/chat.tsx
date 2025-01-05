@@ -15,7 +15,7 @@ const ChatScreen: React.FC = () => {
   const [recording, setRecording] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([{role: "assistant", content: "Hey, how are you today?"}]);
   const [result, setResult] = useState("");
-  const ScrollViewRef = useRef();
+  const scrollViewRef = useRef<ScrollView|null>(null);
 
   const speechStartHandler = async () => {
     try {
@@ -80,24 +80,16 @@ const ChatScreen: React.FC = () => {
       let newMessages = [...messages];
       newMessages.push({role: "user", content: result})
       setMessages([...newMessages]);
-      updateScrollView();
       apiCall(newMessages).then(res => {
         if (res?.success) {
           setMessages([...res.data]);
           setResult('');
-          updateScrollView();
         } else {
           Alert.alert("Error on creating response: ", res!.data ?? "Unknown")
         }
       })
     }
   }
-
-  const updateScrollView = () => {
-    setTimeout(() => {
-        ScrollViewRef?.current?.scrollToEnd({animated: true});
-    }, 400);
-  }; 
 
   useEffect(() => {
     Voice.onSpeechStart = speechStartHandler;
@@ -115,7 +107,7 @@ const ChatScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.chatBox}>
-      <ScrollView ref={ScrollViewRef} style={styles.chatHistory}>
+      <ScrollView ref={scrollViewRef} style={styles.chatHistory} onContentSizeChange={() => {scrollViewRef.current?.scrollToEnd()}}>
         {messages.length > 0 ?
           messages.map((message, index) => (
             <View
